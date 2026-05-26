@@ -1,0 +1,5 @@
+.ql-diamond::before {
+  content: '❖';
+  font-size: 14px;
+  line-height: 1;
+}
