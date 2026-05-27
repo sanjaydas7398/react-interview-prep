@@ -1,5 +1,5 @@
 // API client — talks to the Express/MongoDB backend
-const BASE = import.meta.env.VITE_API_URL + '/api';
+const BASE = (import.meta.env.VITE_API_URL || '') + '/api';
 
 export async function fetchProgress() {
   try {
