@@ -1,7 +1,7 @@
 import { useState, useContext, useEffect, useRef } from "react";
 import { Search, ChevronRight, X, BookOpen, Plus, Pencil, Trash2, Save } from "lucide-react";
 import { C_BASE } from "../constants";
-import { ThemeCtx, Btn } from "../shared";
+import { ThemeCtx, Btn, ToastCtx } from "../shared";
 import { HighlightStyle, syntaxHighlighting } from "@codemirror/language";
 import { tags } from "@lezer/highlight";
 import { EditorView } from "@codemirror/view";
@@ -101,6 +101,7 @@ function ReactPreview({ code }) {
 
 export default function INTERVIEW_REACT() {
   const C = useContext(ThemeCtx);
+  const toast = useContext(ToastCtx);
   const [activeTab, setActiveTab] = useState("Machine Coding");
   const [codingQuestions, setCodingQuestions] = useState([]);
   const [scenarioQuestions, setScenarioQuestions] = useState([]);
@@ -152,14 +153,14 @@ export default function INTERVIEW_REACT() {
         await deleteReactScenarioQuestion(q.id);
         setScenarioQuestions(prev => prev.filter(x => x.id !== q.id));
       }
-    } catch (err) { alert(err.message); }
+    } catch (err) { toast(err.message, "error"); }
   };
 
   const handleSaveQuestion = async () => {
     if (activeTab === "Machine Coding") {
-      if (!formData.title?.trim() || !formData.description?.trim()) return alert("Title and Description required.");
+      if (!formData.title?.trim() || !formData.description?.trim()) return toast("Title and Description required.", "warn");
     } else {
-      if (!formData.description?.trim()) return alert("Question Description required.");
+      if (!formData.description?.trim()) return toast("Question Description required.", "warn");
     }
     
     setFormSaving(true);
@@ -181,8 +182,9 @@ export default function INTERVIEW_REACT() {
           setScenarioQuestions(prev => [...prev, created]);
         }
       }
+      toast(editingQuestion ? "Question updated!" : "Question added!", "success");
       setShowFormModal(false); setEditingQuestion(null);
-    } catch (err) { alert(err.message); } finally { setFormSaving(false); }
+    } catch (err) { toast(err.message, "error"); } finally { setFormSaving(false); }
   };
 
   const currentQuestions = activeTab === "Machine Coding" ? codingQuestions : scenarioQuestions;

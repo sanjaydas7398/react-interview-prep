@@ -9,7 +9,7 @@ import { HighlightStyle, syntaxHighlighting } from "@codemirror/language";
 import { tags } from "@lezer/highlight";
 
 import { C_BASE } from "../constants";
-import { ThemeCtx, Btn, Tag } from "../shared";
+import { ThemeCtx, Btn, Tag, ToastCtx } from "../shared";
 import {
   addCodingQuestion, updateCodingQuestion, deleteCodingQuestion,
   addOutputQuestion, updateOutputQuestion, deleteOutputQuestion,
@@ -69,6 +69,7 @@ function CodeEditor({ value, onChange }) {
 
 export default function INTERVIEW_JS() {
   const C = useContext(ThemeCtx);
+  const toast = useContext(ToastCtx);
   const [activeTab, setActiveTab] = useState("Coding");
   const [activeFilter, setActiveFilter] = useState("Basic Coding");
   const [search, setSearch] = useState("");
@@ -128,13 +129,13 @@ export default function INTERVIEW_JS() {
         setLinkedInQuestions(prev => prev.filter(x => x.id !== q.id));
       }
     } catch (err) {
-      alert("Failed to delete: " + err.message);
+      toast("Failed to delete: " + err.message, "error");
     }
   };
 
   const handleSaveQuestion = async () => {
     if (!formData.title?.trim() || !formData.description?.trim()) {
-      alert("Title and Description are required.");
+      toast("Title and Description are required.", "warn");
       return;
     }
     setFormSaving(true);
@@ -165,10 +166,11 @@ export default function INTERVIEW_JS() {
           setLinkedInQuestions(prev => [...prev, created]);
         }
       }
+      toast(editingQuestion ? "Question updated!" : "Question added!", "success");
       setShowFormModal(false);
       setEditingQuestion(null);
     } catch (err) {
-      alert("Failed to save: " + err.message);
+      toast("Failed to save: " + err.message, "error");
     } finally {
       setFormSaving(false);
     }

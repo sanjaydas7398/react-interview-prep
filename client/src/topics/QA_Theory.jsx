@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useContext, useMemo, useRef } from "react";
-import { Block, Btn, Row, ThemeCtx, Spacer } from "../shared";
+import { Block, Btn, Row, ThemeCtx, Spacer, ToastCtx } from "../shared";
 import { C_BASE } from "../constants";
 import { fetchQA, addQA, updateQA, deleteQA, uploadImage } from "../api";
 import ReactQuill from "react-quill-new";
@@ -9,6 +9,7 @@ import "../quill-diamond.css";
 
 export default function QA_Theory() {
   const C = useContext(ThemeCtx);
+  const toast = useContext(ToastCtx);
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   
@@ -45,7 +46,7 @@ export default function QA_Theory() {
           quill.setSelection(range.index + 1);
         } catch (err) {
           console.error("Upload failed", err);
-          alert("Failed to upload image. Make sure the backend is running.");
+          toast("Failed to upload image. Make sure the backend is running.", "error");
         }
         setUploading(false);
       }
@@ -69,7 +70,7 @@ export default function QA_Theory() {
           quill.setSelection(range.index + 1);
         } catch (err) {
           console.error("Upload failed", err);
-          alert("Failed to upload inline image.");
+          toast("Failed to upload inline image.", "error");
         }
         setUploading(false);
       }
@@ -209,7 +210,7 @@ export default function QA_Theory() {
       updateFn(url);
     } catch (err) {
       console.error("Upload failed", err);
-      alert("Failed to upload image. Make sure the backend is running.");
+      toast("Failed to upload image. Make sure the backend is running.", "error");
     }
     setUploading(false);
   };
@@ -254,9 +255,10 @@ export default function QA_Theory() {
       setEditDraft(null);
       setMainTab("learn");
       setSelectedId(id);
+      toast("Question saved!", "success");
     } catch (error) {
       console.error("Error saving edit:", error.message, error);
-      alert("Failed to save: " + error.message);
+      toast("Failed to save: " + error.message, "error");
     }
   };
 

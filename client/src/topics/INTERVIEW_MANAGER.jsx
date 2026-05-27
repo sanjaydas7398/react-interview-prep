@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from "react";
 import { Search, ChevronRight, X, Plus, Pencil, Trash2, Save } from "lucide-react";
 import { C_BASE } from "../constants";
-import { ThemeCtx, Btn } from "../shared";
+import { ThemeCtx, Btn, ToastCtx } from "../shared";
 import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
 import {
@@ -10,6 +10,7 @@ import {
 
 export default function INTERVIEW_MANAGER() {
   const C = useContext(ThemeCtx);
+  const toast = useContext(ToastCtx);
   const [questions, setQuestions] = useState([]);
   const [search, setSearch] = useState("");
   
@@ -46,12 +47,13 @@ export default function INTERVIEW_MANAGER() {
       try {
         await deleteManagerQuestion(q.id);
         setQuestions(prev => prev.filter(x => x.id !== q.id));
-      } catch (err) { alert(err.message); }
+        toast("Question deleted.", "success");
+      } catch (err) { toast(err.message, "error"); }
     }
   };
 
   const handleSaveQuestion = async () => {
-    if (!formData.description?.trim()) return alert("Question Description required.");
+    if (!formData.description?.trim()) return toast("Question Description required.", "warn");
     setFormSaving(true);
     try {
       if (editingQuestion) {
@@ -61,8 +63,9 @@ export default function INTERVIEW_MANAGER() {
         const created = await addManagerQuestion(formData);
         setQuestions(prev => [...prev, created]);
       }
+      toast(editingQuestion ? "Question updated!" : "Question added!", "success");
       setShowFormModal(false); setEditingQuestion(null);
-    } catch (err) { alert(err.message); } finally { setFormSaving(false); }
+    } catch (err) { toast(err.message, "error"); } finally { setFormSaving(false); }
   };
 
   const filtered = questions.filter(q => 
