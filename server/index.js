@@ -37,7 +37,7 @@ app.post('/api/upload', upload.single('image'), async (req, res) => {
     fs.unlinkSync(req.file.path);
     res.json({ url: result.secure_url });
   } catch (err) {
-    console.error("Upload error:", err);
+    console.error('Upload error:', err);
     res.status(500).json({ error: err.message });
   }
 });
