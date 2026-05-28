@@ -179,7 +179,7 @@ function makeQuestionModel(name, extraFields = {}) {
 }
 
 function registerCRUD(app, path, Model) {
-  app.get(path, async (req, res) => { try { res.json(await Model.find().sort({ createdAt: -1 })); } catch (err) { res.status(500).json({ error: err.message }); } });
+  app.get(path, async (req, res) => { try { res.json(await Model.find().sort({ createdAt: 1 })); } catch (err) { res.status(500).json({ error: err.message }); } });
   app.post(path, async (req, res) => { try { res.status(201).json(await Model.create(req.body)); } catch (err) { res.status(500).json({ error: err.message }); } });
   app.put(`${path}/:id`, async (req, res) => { try { const u = await Model.findByIdAndUpdate(req.params.id, req.body, { new: true }); if (!u) return res.status(404).json({ error: 'Not found' }); res.json(u); } catch (err) { res.status(500).json({ error: err.message }); } });
   app.delete(`${path}/:id`, async (req, res) => { try { await Model.findByIdAndDelete(req.params.id); res.json({ success: true }); } catch (err) { res.status(500).json({ error: err.message }); } });
