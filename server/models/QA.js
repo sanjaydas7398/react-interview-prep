@@ -7,6 +7,7 @@ const qaSchema = new mongoose.Schema(
     category: { type: String, default: 'React' },
     subCategory: { type: String, default: 'All' },
     imageUrl: { type: String, default: '' },
+    importance: { type: String, default: 'normal' },
   },
   { timestamps: true }
 );

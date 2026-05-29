@@ -18,7 +18,11 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 // ── Connect to MongoDB ──────────────────────────────────────────────────────
 mongoose
   .connect(process.env.MONGO_URI)
-  .then(() => console.log('✅ MongoDB connected'))
+  .then(async () => {
+    console.log('✅ MongoDB connected');
+    // Ensure all existing QA documents have an 'importance' field
+    await QA.updateMany({ importance: { $exists: false } }, { $set: { importance: 'normal' } });
+  })
   .catch(err => { console.error('❌ MongoDB error:', err.message); });
 
 // ── Cloudinary & Multer Config ──────────────────────────────────────────────
@@ -135,8 +139,8 @@ app.get('/api/qa', async (req, res) => {
 
 app.post('/api/qa', async (req, res) => {
   try {
-    const { q, a, category, subCategory, imageUrl } = req.body;
-    const newQa = await QA.create({ q, a, category, subCategory, imageUrl });
+    const { q, a, category, subCategory, imageUrl, importance } = req.body;
+    const newQa = await QA.create({ q, a, category, subCategory, imageUrl, importance });
     res.json(newQa);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -145,12 +149,12 @@ app.post('/api/qa', async (req, res) => {
 
 app.put('/api/qa/:id', async (req, res) => {
   try {
-    const { q, a, category, subCategory, imageUrl } = req.body;
-    const updated = await QA.findByIdAndUpdate(
-      req.params.id,
-      { q, a, category, subCategory, imageUrl },
-      { new: true }
-    );
+      const { q, a, category, subCategory, imageUrl, importance } = req.body;
+      const updated = await QA.findByIdAndUpdate(
+        req.params.id,
+        { q, a, category, subCategory, imageUrl, importance },
+        { new: true }
+      );
     if (!updated) return res.status(404).json({ error: 'QA not found' });
     res.json(updated);
   } catch (err) {
